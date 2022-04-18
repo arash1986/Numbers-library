@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>map_enable</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>send_file_enable</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>file_count_limit</key>
+        <value>6</value>
+    </entry>
+
+    <entry>
+        <key>file_count_limits</key>
+        <value>10</value>
+    </entry>
+
+
+</defaultsMap>

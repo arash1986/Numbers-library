@@ -1,0 +1,13 @@
+<resources>
+
+    <style name="AnimatedDialog" parent="Theme.AppCompat.Light.Dialog">
+<!--        <item name="android:windowBackground">@null</item>-->
+        <item name="android:windowAnimationStyle">@style/PauseDialogAnimation</item>
+    </style>
+
+    <style name="PauseDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/zoomin</item>
+        <item name="android:windowExitAnimation">@anim/fadeout</item>
+    </style>
+
+</resources>

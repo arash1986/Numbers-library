@@ -1,3 +1,4 @@
+include ':CameraGallery'
 include ':Numbers'
 include ':app'
 rootProject.name = "Library Test"
