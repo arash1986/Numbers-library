@@ -43,21 +43,23 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <TextView
+                android:gravity="center"
                 android:text="فعلا نه"
                 android:background="@color/gray"
                 android:textColor="@color/white"
                 android:id="@+id/dialogPermission_btnCancel"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:textSize="12dp" />
 
-            <Button
-                android:textColor="@color/white"
+            <TextView
+
+ android:gravity="center"               android:textColor="@color/white"
                 android:id="@+id/dialogPermission_btnok"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:background="@color/green"
                 android:text="باشه"

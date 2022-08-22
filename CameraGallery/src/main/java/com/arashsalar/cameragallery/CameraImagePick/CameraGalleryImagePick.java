@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
@@ -20,24 +21,35 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.arashsalar.cameragallery.BuildConfig;
+import com.arashsalar.cameragallery.CameraImagePick.adapter.RecyclerAdapter;
 import com.arashsalar.cameragallery.R;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCaller;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class CameraGalleryImagePick extends AppCompatActivity {
-
+public class CameraGalleryImagePick extends AppCompatActivity implements RecyclerAdapter.OnClickInterface, RecyclerAdapter.GetList{
+    public GetClick getClick;
+    public GetList getList;
     private final Activity activity;
     private Bitmap selectedImage;
+    private ArrayList<Bitmap> arrayList;
     private ImageView imageView = null;
+    private RecyclerView recyclerView = null;
+    private RecyclerAdapter recyclerAdapter;
     public final static int PERMISSION_CAMERA_REQUEST = 52;
     public final static int PERMISSION_STORAGE_REQUEST = 53;
     public static String PERMISSION_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -45,12 +57,49 @@ public class CameraGalleryImagePick extends AppCompatActivity {
     public final static String ImagePath = Environment.getExternalStorageDirectory() + File.separator + ".welfareassistantyariresan" + File.separator;
     protected final BetterActivityResult<Intent, ActivityResult> activityLauncher;
     File file;
-    public CameraGalleryImagePick(Activity activity, int viewId)
+
+    public interface GetList {
+        void getList(ArrayList<Bitmap> list);
+    }
+    public interface GetClick {
+        void getClick(View view, int position);
+    }
+    public void ListListener(GetList getList) {
+        this.getList = getList;
+    }
+
+    public void ClickListener(GetClick getClick) {
+        this.getClick = getClick;
+    }
+
+    public CameraGalleryImagePick(Activity activity, int viewId, int recyclerId)
     {
         file = new File(ImagePath);
         this.activity = activity;
+        try {
+
+            if (file.isDirectory()) {
+                String[] children = file.list();
+                assert children != null;
+                for (String child : children) {
+                    new File(file, child).delete();
+                }
+            }
+        }catch (Exception e)
+        {
+            // Log.d("file list err2:", e.toString());
+        }
         if(viewId != 0)
             imageView = activity.findViewById(viewId);
+        if(recyclerId != 0) {
+            arrayList = new ArrayList<>();
+            recyclerView = activity.findViewById(recyclerId);
+            recyclerAdapter = new RecyclerAdapter(arrayList);
+            recyclerAdapter.setListListener(this);
+            recyclerAdapter.setClickListener(this);
+            recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+            recyclerView.setAdapter(recyclerAdapter);
+        }
         activityLauncher = BetterActivityResult.registerActivityForResult((ActivityResultCaller) activity);
     }
     public Bitmap openSomeActivityForResult(ImagePickedStatus mode) {
@@ -130,6 +179,12 @@ public class CameraGalleryImagePick extends AppCompatActivity {
                                 selectedImage.compress(Bitmap.CompressFormat.JPEG, compressLevel, out);
                                 if(imageView != null)
                                     imageView.setImageBitmap(selectedImage);
+                                if(recyclerView != null)
+                                {
+                                    arrayList.add(selectedImage);
+                                    recyclerAdapter.notifyDataSetChanged();
+                                }
+
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
                             }
@@ -165,6 +220,12 @@ public class CameraGalleryImagePick extends AppCompatActivity {
                                 photo.compress(Bitmap.CompressFormat.JPEG, compressLevel, out);
                                 if(imageView != null)
                                     imageView.setImageBitmap(photo);
+                                if(recyclerView != null)
+                                {
+                                    arrayList.add(photo);
+                                    recyclerAdapter.notifyDataSetChanged();
+                                }
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -207,8 +268,8 @@ public class CameraGalleryImagePick extends AppCompatActivity {
         ////////////////////////////////
         TextView txtTitle = dialog.findViewById(R.id.dialogPermission_txtTitle);
         TextView txtComment = dialog.findViewById(R.id.dialogPermission_txtComment);
-        Button btnOk = dialog.findViewById(R.id.dialogPermission_btnok);
-        Button btnCancel = dialog.findViewById(R.id.dialogPermission_btnCancel);
+        TextView btnOk = dialog.findViewById(R.id.dialogPermission_btnok);
+        TextView btnCancel = dialog.findViewById(R.id.dialogPermission_btnCancel);
         ////////////////////////////////
         txtTitle.setText("پیغام سیستم");
 
@@ -247,4 +308,16 @@ public class CameraGalleryImagePick extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void clikced(@Nullable View view, int position) {
+        if(getClick != null)
+            getClick.getClick(view, position);
+    }
+
+    @Override
+    public void getArrayList(@NonNull ArrayList<Bitmap> list) {
+        if(getList != null) {
+            getList.getList(list);
+        }
+    }
 }
